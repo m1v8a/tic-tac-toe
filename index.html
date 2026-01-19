@@ -9,7 +9,22 @@
 </head>
 <body>
 	<div class="wrapper">
-		<div class="board"></div>
+		<div class="start-screen">
+			<h1>Tic Tac Toe</h1>
+			<div class="start-screen-input">
+				<span class="warning hidden"></span>
+				<label>Enter Your Name: </label>
+				<input type="text" name="name">
+				<button class="start-button">Start</button>
+			</div>
+		</div>
+		<div class="game-screen">
+			<div class="score-board">
+				<div class="player"></div>
+				<div class="computer"></div>
+			</div>
+			<div class="game-board"></div>
+		</div>
 	</div>
 
 	<script src="script.js"></script>

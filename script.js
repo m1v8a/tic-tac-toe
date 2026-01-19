@@ -81,7 +81,22 @@ const GAME = (function() {
 })();
 
 const UI = (function() {
-	const boardEl = document.querySelector(".board");
+	const boardEl = document.querySelector(".game-board");
+	const screens = {
+		start: document.querySelector(".start-screen"),
+		game: document.querySelector(".game-screen")
+	}
+
+	document.querySelector(".start-button").addEventListener("click", () => {
+		const playerName = document.querySelector("input[name='name']").value;
+		if(!playerName) {
+			const warning = document.querySelector(".warning");
+			warning.textContent = "Please input a name";
+			warning.classList.remove("hidden");
+			return;
+		}
+		switchScreen(screens.game);
+	});
 	
 	function createBoardUI(board) {
 		board.forEach((row, y) => {
@@ -101,6 +116,13 @@ const UI = (function() {
 		createBoardUI(board);
 	}
 
+	function switchScreen(screen) {
+		for(let key in screens) {
+			screens[key].classList.add("hidden");
+		}
+		screen.classList.remove("hidden");
+	}
+
 	function setControls(inputHandler) {
 		boardEl.addEventListener("click", (e) => {
 			if(!e.target.classList.contains("cell")) return;
@@ -109,19 +131,30 @@ const UI = (function() {
 			inputHandler(targetY, targetX);
 		})
 	}
+	
+
+	function getScreens() {
+		return screens;
+	}
 
 	return {
 		createBoardUI, 
 		setControls,
 		updateBoardUI,
+		switchScreen,
+		getScreens,
 	}
 })();
 
-GAME.createBoard()
-UI.createBoardUI(GAME.getBoard());
-UI.setControls((y,x) => {
+GAME.createBoard() // instantiate the gameboard
+UI.switchScreen(UI.getScreens().start); // set the 'start' screen as initial screen
+UI.createBoardUI(GAME.getBoard()); // create the UI for the game getBoard
+
+// sets the control (click event listeners for each cells on the board)
+UI.setControls((y,x) => { 
 	GAME.play(GAME.getCurrentTurn(), y, x);
 	UI.updateBoardUI(GAME.getBoard());
 });
+
 
 
