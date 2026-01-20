@@ -17,13 +17,48 @@ const GAME = (function() {
 		}
 	}
 
+
 	function play(marker, y, x) {
 		// loop throught the gameboard and find x (row) and y (col)
 		if(GAMEBOARD[y][x] !== null || isGameOver) return;
-		GAMEBOARD[y][x] = marker;
+			GAMEBOARD[y][x] = marker;	
+		
+			changeTurn();
+			checkWinner();
+			if(isGameOver) return;
+			computerPlay();
+
+		GAMEBOARD.forEach(r => console.log(r));
+	}
+
+	function computerPlay() {
+		let cy = Math.floor(Math.random() * 2);
+		let cx = Math.floor(Math.random() * 2);
+		let moves = 0;
+		while (GAMEBOARD[cy][cx] !== null && moves < 10) {
+			cy = Math.floor(Math.random() * 3);
+			cx = Math.floor(Math.random() * 3);
+			moves++
+		}
+
+		if(moves >= 10) {
+			for(let y = 0; y < GAMEBOARD.length; y++) {
+				for(let x = 0; x < GAMEBOARD[y].length; x++) {
+					if(GAMEBOARD[y][x] === null) {
+						cy = y;
+						cx = x;
+						return;
+					}
+				}
+			}
+		}
+
+		GAMEBOARD[cy][cx] = getCurrentTurn();
 		changeTurn();
 		checkWinner();
 	}
+
+	
 
 	function changeTurn() {
 		if(turn === X) {
@@ -148,9 +183,9 @@ const UI = (function() {
 
 GAME.createBoard() // instantiate the gameboard
 UI.switchScreen(UI.getScreens().start); // set the 'start' screen as initial screen
-UI.createBoardUI(GAME.getBoard()); // create the UI for the game getBoard
+UI.createBoardUI(GAME.getBoard()); // create the UI for the game board
 
-// sets the control (click event listeners for each cells on the board)
+// sets the control (click event listeners for each cells on the board, using even delegation)
 UI.setControls((y,x) => { 
 	GAME.play(GAME.getCurrentTurn(), y, x);
 	UI.updateBoardUI(GAME.getBoard());
