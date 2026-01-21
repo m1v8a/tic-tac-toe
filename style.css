@@ -72,7 +72,14 @@
 .score-board {
 	background-color: var(--bg-second);
 	width: 40%;
-	justify-content: center;
+	display: flex;
+	justify-content: space-between;
+	font-size: 2rem;
+	padding: 1rem;
+}
+
+.score-board > * {
+	text-align: center
 }
 
 .game-board {

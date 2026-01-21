@@ -1,10 +1,10 @@
-
 const GAME = (function() {
 	const GAMEBOARD = [];
 	const X = "x"; 
 	const O = "o";
+	const players = {};
 	let turn = O;
-	let isGameOver = false;
+	let gameOver = false;
 
 	// create a 3 x 3 board
 	function createBoard() {
@@ -17,15 +17,14 @@ const GAME = (function() {
 		}
 	}
 
-
 	function play(marker, y, x) {
 		// loop throught the gameboard and find x (row) and y (col)
-		if(GAMEBOARD[y][x] !== null || isGameOver) return;
+		if(GAMEBOARD[y][x] !== null || gameOver) return;
 			GAMEBOARD[y][x] = marker;	
 		
 			changeTurn();
 			checkWinner();
-			if(isGameOver) return;
+			if(gameOver) return;
 			computerPlay();
 
 		GAMEBOARD.forEach(r => console.log(r));
@@ -88,13 +87,25 @@ const GAME = (function() {
 			const r2 = {y: Number(row[1][0]), x: Number(row[1][1])};
 			const r3 = {y: Number(row[2][0]), x: Number(row[2][1])};
 			if(GAMEBOARD[r1.x][r1.y] === X && GAMEBOARD[r2.x][r2.y] === X && GAMEBOARD[r3.x][r3.y] === X) {
-				console.log("WINNER X");
-				isGameOver = true;
+				gameOver = true;	
+				updateScore(X);
 				return;
-			}else if(GAMEBOARD[r1.x][r1.y] === O && GAMEBOARD[r2.x][r2.y] === O && GAMEBOARD[r3.x][r3.y] === O) {
-				console.log("WINNER O");
-				isGameOver = true;
+			} else if(GAMEBOARD[r1.x][r1.y] === O && GAMEBOARD[r2.x][r2.y] === O && GAMEBOARD[r3.x][r3.y] === O) {
+				gameOver = true;
+				updateScore(O);
 				return;
+			}
+		}
+	}
+
+	function isGameOver() {
+		return gameOver;
+	}
+
+	function updateScore(marker) {
+		for( let key in players) {
+			if(players[key].marker === marker) {
+				players[key].score += 1;
 			}
 		}
 	}
@@ -107,16 +118,36 @@ const GAME = (function() {
 		return turn;
 	}
 
+	function createPlayer(name, pos) {
+		if(pos === 1) {
+			players.playerOne =  { name, score: 0, marker: O };
+		} else {
+			players.playerTwo =  { name: "Computer", score: 0 };
+		}
+	}
+
+	function getPlayers() {
+		return players;
+	}
+
 	return {
 		createBoard,
 		getBoard,
 		play,
 		getCurrentTurn,
+		createPlayer,
+		getPlayers,
+		isGameOver,
 	}
 })();
 
 const UI = (function() {
 	const boardEl = document.querySelector(".game-board");
+	const playerOneNameEl = document.querySelector(".player-one .name");
+	const playerOneScoreEl = document.querySelector(".player-one .score");
+	const playerTwoNameEl = document.querySelector(".player-two .name");
+	const playerTwoScoreEl = document.querySelector(".player-two .score");
+
 	const screens = {
 		start: document.querySelector(".start-screen"),
 		game: document.querySelector(".game-screen")
@@ -130,6 +161,9 @@ const UI = (function() {
 			warning.classList.remove("hidden");
 			return;
 		}
+		GAME.createPlayer(playerName, 1);
+		GAME.createPlayer("Computer", 2);
+		updateScoreBoard(GAME.getPlayers().playerOne, GAME.getPlayers().playerTwo);
 		switchScreen(screens.game);
 	});
 	
@@ -166,6 +200,14 @@ const UI = (function() {
 			inputHandler(targetY, targetX);
 		})
 	}
+
+
+	function updateScoreBoard(playerOne, playerTwo) {
+		playerOneNameEl.textContent = playerOne.name		
+		playerOneScoreEl.textContent = playerOne.score;
+		playerTwoNameEl.textContent = playerTwo.name;
+		playerTwoScoreEl.textContent = playerTwo.score;
+	}
 	
 
 	function getScreens() {
@@ -178,17 +220,24 @@ const UI = (function() {
 		updateBoardUI,
 		switchScreen,
 		getScreens,
+		updateScoreBoard,
 	}
 })();
+
+
 
 GAME.createBoard() // instantiate the gameboard
 UI.switchScreen(UI.getScreens().start); // set the 'start' screen as initial screen
 UI.createBoardUI(GAME.getBoard()); // create the UI for the game board
 
+
 // sets the control (click event listeners for each cells on the board, using even delegation)
 UI.setControls((y,x) => { 
 	GAME.play(GAME.getCurrentTurn(), y, x);
 	UI.updateBoardUI(GAME.getBoard());
+	if(GAME.isGameOver()) {
+		UI.updateScoreBoard(GAME.getPlayers().playerOne, GAME.getPlayers().playerTwo);
+	}
 });
 
 
