@@ -1,20 +1,30 @@
 const GAME = (function() {
-	const GAMEBOARD = [];
+	let GAMEBOARD = createBoard();
 	const X = "x"; 
 	const O = "o";
 	const players = {};
 	let turn = O;
 	let gameOver = false;
+	let draw = false;
 
 	// create a 3 x 3 board
 	function createBoard() {
+		const board = [];
 		for(let i = 0; i < 3; i++) {
 			const row = [];
 			for(let j = 0; j < 3; j++) {
 				row.push(null);
 			}
-			GAMEBOARD.push(row);
+			board.push(row);
 		}
+
+		return board;
+	}
+
+	function resetGame() {
+		GAMEBOARD = createBoard();
+		gameOver = false;
+		turn = O;
 	}
 
 	function play(marker, y, x) {
@@ -24,7 +34,7 @@ const GAME = (function() {
 		
 			changeTurn();
 			checkWinner();
-			if(gameOver) return;
+			if(gameOver || draw) return;
 			computerPlay();
 
 		GAMEBOARD.forEach(r => console.log(r));
@@ -51,7 +61,6 @@ const GAME = (function() {
 				}
 			}
 		}
-
 		GAMEBOARD[cy][cx] = getCurrentTurn();
 		changeTurn();
 		checkWinner();
@@ -86,25 +95,45 @@ const GAME = (function() {
 			const r1 = {y: Number(row[0][0]), x: Number(row[0][1])};
 			const r2 = {y: Number(row[1][0]), x: Number(row[1][1])};
 			const r3 = {y: Number(row[2][0]), x: Number(row[2][1])};
-			if(GAMEBOARD[r1.x][r1.y] === X && GAMEBOARD[r2.x][r2.y] === X && GAMEBOARD[r3.x][r3.y] === X) {
+			if(GAMEBOARD[r1.y][r1.x] === X && GAMEBOARD[r2.y][r2.x] === X && GAMEBOARD[r3.y][r3.x] === X) {
 				gameOver = true;	
 				updateScore(X);
 				return;
-			} else if(GAMEBOARD[r1.x][r1.y] === O && GAMEBOARD[r2.x][r2.y] === O && GAMEBOARD[r3.x][r3.y] === O) {
+			} else if(GAMEBOARD[r1.y][r1.x] === O && GAMEBOARD[r2.y][r2.x] === O && GAMEBOARD[r3.y][r3.x] === O) {
 				gameOver = true;
 				updateScore(O);
 				return;
 			}
+
+			draw = checkForDraw();
 		}
+	}
+
+	function checkForDraw() {
+		let emptyCell = 0;
+		for(let y = 0; y < GAMEBOARD.length; y++)  {
+			for(let x = 0; x < GAMEBOARD[y].length; x++) {
+				if(GAMEBOARD[y][x] === null) {
+					emptyCell += 1;
+				}
+			}
+		}
+		return !isGameOver() && emptyCell === 0;
 	}
 
 	function isGameOver() {
 		return gameOver;
 	}
 
+	function isGameDraw() {
+		return draw;
+	}
+
 	function updateScore(marker) {
+		const players = getPlayers();
 		for( let key in players) {
 			if(players[key].marker === marker) {
+				console.log(players[key]);
 				players[key].score += 1;
 			}
 		}
@@ -122,7 +151,7 @@ const GAME = (function() {
 		if(pos === 1) {
 			players.playerOne =  { name, score: 0, marker: O };
 		} else {
-			players.playerTwo =  { name: "Computer", score: 0 };
+			players.playerTwo =  { name: "Computer", score: 0, marker: X};
 		}
 	}
 
@@ -132,12 +161,14 @@ const GAME = (function() {
 
 	return {
 		createBoard,
+		resetGame,
 		getBoard,
 		play,
 		getCurrentTurn,
 		createPlayer,
 		getPlayers,
 		isGameOver,
+		isGameDraw,
 	}
 })();
 
@@ -182,8 +213,9 @@ const UI = (function() {
 
 	function updateBoardUI(board) {
 		boardEl.innerHTML = "";
-		createBoardUI(board);
+		GAMEBOARD = createBoardUI(board);
 	}
+
 
 	function switchScreen(screen) {
 		for(let key in screens) {
@@ -236,7 +268,16 @@ UI.setControls((y,x) => {
 	GAME.play(GAME.getCurrentTurn(), y, x);
 	UI.updateBoardUI(GAME.getBoard());
 	if(GAME.isGameOver()) {
-		UI.updateScoreBoard(GAME.getPlayers().playerOne, GAME.getPlayers().playerTwo);
+		UI.updateScoreBoard(GAME.getPlayers().playerOne, GAME.getPlayers().playerTwo);	
+		setTimeout(() => {
+			GAME.resetGame();
+			UI.updateBoardUI(GAME.getBoard());
+		}, 1000);
+	} else if(GAME.isGameDraw()) {
+		setTimeout(() => {
+			GAME.resetGame();
+			UI.updateBoardUI(GAME.getBoard());
+		}, 1000);
 	}
 });
 
