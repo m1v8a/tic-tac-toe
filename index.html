@@ -3,40 +3,16 @@
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>Tic Tac Toe</title>
+	<title>Tic-Tac-Toe</title>
 
 	<link rel="stylesheet" href="style.css">
 </head>
 <body>
 	<div class="wrapper">
-		<div class="start-screen">
-			<h1>Tic Tac Toe</h1>
-			<div class="start-screen-input">
-				<span class="warning hidden"></span>
-				<label>Enter Your Name: </label>
-				<input type="text" name="name">
-				<button class="start-button">Start</button>
-			</div>
-		</div>
-		<div class="game-screen">
-			<div class="score-board">
-				<div class="player-one">
-					<p class="name"></p>
-					<p class="score"></p>
-				</div>
-				<div class="player-two">
-					<p class="name"></p>
-					<p class="score"></p>
-				</div>
-			</div>
-			<div class="game-board"></div>
-		</div>
-		<div class="game-over-screen">
-			<p class="winner"></p>
-			<button class="next-round-button">Next Round</button>
-		</div>
+		<div id="start-screen"></div>
+		<div id="game-screen"></div>
+		<div id="game-over-screen"></div>
 	</div>
-
 	<script src="script.js"></script>
 </body>
 </html>
