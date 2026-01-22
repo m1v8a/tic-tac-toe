@@ -17,6 +17,9 @@
 	display: none !important;
 }
 
+button {
+	padding: 0.5em 1em;
+}
 
 .wrapper {
 	max-width: 1024px;
@@ -97,4 +100,15 @@
 	place-content: center;
 	font-size: 4rem;
 	border: 1px solid;
+}
+
+.game-over-screen {
+	width: 500px;
+	height: 500px;
+	font-size: 2rem;
+	display: flex;
+	gap: 1rem;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
 }
