@@ -9,9 +9,18 @@
 </head>
 <body>
 	<div class="wrapper">
-		<div id="start-screen"></div>
-		<div id="game-screen"></div>
-		<div id="game-over-screen"></div>
+		<div id="start-screen">
+			<h1>Tic Tac Toe</h1>
+			<div>
+				<label for="name">Input Your Name:</label>
+				<input type="text" id="name" name="name" required>
+				<button id="start-button">Start</button>
+			</div>
+		</div>
+		<div id="game-screen">
+			<div id="game-board"></div>
+		</div>
+		<div id="game-over-screen">Game Over</div>
 	</div>
 	<script src="script.js"></script>
 </body>

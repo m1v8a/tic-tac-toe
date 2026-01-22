@@ -1,0 +1,22 @@
+* {
+	box-sizing: border-box;
+	padding: 0;
+	margin: 0;
+}
+
+.hidden {
+	display: none;
+}
+
+#game-screen #game-board {
+	width: 500px;
+	height: 500px;
+	display: grid;
+	grid-template-columns: repeat(3, 1fr);
+	grid-template-rows: repeat(3, 1fr);
+	gap: 0.5rem;
+}
+
+#game-board .cell {
+	border: 1px solid;
+}
