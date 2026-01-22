@@ -6,6 +6,7 @@ const GAME = (function() {
 	let turn = O;
 	let gameOver = false;
 	let draw = false;
+	let winner = null;
 
 	// create a 3 x 3 board
 	function createBoard() {
@@ -25,6 +26,14 @@ const GAME = (function() {
 		GAMEBOARD = createBoard();
 		gameOver = false;
 		turn = O;
+	}
+
+	function getWinner(){
+		for (let key in players) {
+			if(players[key].marker === winner) {
+				return players[key].name;
+			}
+		}
 	}
 
 	function play(marker, y, x) {
@@ -66,7 +75,6 @@ const GAME = (function() {
 		checkWinner();
 	}
 
-	
 
 	function changeTurn() {
 		if(turn === X) {
@@ -97,10 +105,12 @@ const GAME = (function() {
 			const r3 = {y: Number(row[2][0]), x: Number(row[2][1])};
 			if(GAMEBOARD[r1.y][r1.x] === X && GAMEBOARD[r2.y][r2.x] === X && GAMEBOARD[r3.y][r3.x] === X) {
 				gameOver = true;	
+				winner = X;
 				updateScore(X);
 				return;
 			} else if(GAMEBOARD[r1.y][r1.x] === O && GAMEBOARD[r2.y][r2.x] === O && GAMEBOARD[r3.y][r3.x] === O) {
 				gameOver = true;
+				winner = O;
 				updateScore(O);
 				return;
 			}
@@ -169,6 +179,7 @@ const GAME = (function() {
 		getPlayers,
 		isGameOver,
 		isGameDraw,
+		getWinner,
 	}
 })();
 
@@ -178,25 +189,16 @@ const UI = (function() {
 	const playerOneScoreEl = document.querySelector(".player-one .score");
 	const playerTwoNameEl = document.querySelector(".player-two .name");
 	const playerTwoScoreEl = document.querySelector(".player-two .score");
+	const winnerEl = document.querySelector(".winner");
+	const startButton = document.querySelector(".start-button");
+	const nextRoundButton = document.querySelector(".next-round-button");
 
 	const screens = {
 		start: document.querySelector(".start-screen"),
-		game: document.querySelector(".game-screen")
+		game: document.querySelector(".game-screen"),
+		["game-over"]: document.querySelector(".game-over-screen"),
 	}
 
-	document.querySelector(".start-button").addEventListener("click", () => {
-		const playerName = document.querySelector("input[name='name']").value;
-		if(!playerName) {
-			const warning = document.querySelector(".warning");
-			warning.textContent = "Please input a name";
-			warning.classList.remove("hidden");
-			return;
-		}
-		GAME.createPlayer(playerName, 1);
-		GAME.createPlayer("Computer", 2);
-		updateScoreBoard(GAME.getPlayers().playerOne, GAME.getPlayers().playerTwo);
-		switchScreen(screens.game);
-	});
 	
 	function createBoardUI(board) {
 		board.forEach((row, y) => {
@@ -216,20 +218,61 @@ const UI = (function() {
 		GAMEBOARD = createBoardUI(board);
 	}
 
+	function updateGameOverScreen(winnerName) {
+		winnerEl.textContent = winnerName;
+	}
+
 
 	function switchScreen(screen) {
 		for(let key in screens) {
 			screens[key].classList.add("hidden");
 		}
-		screen.classList.remove("hidden");
+		screens[screen].classList.remove("hidden");
 	}
 
-	function setControls(inputHandler) {
+	function setControls() {
+		const switchDelay = 500
 		boardEl.addEventListener("click", (e) => {
 			if(!e.target.classList.contains("cell")) return;
 			const targetY = e.target.dataset.y;
 			const targetX = e.target.dataset.x;
-			inputHandler(targetY, targetX);
+
+			GAME.play(GAME.getCurrentTurn(), targetY, targetX);
+			updateBoardUI(GAME.getBoard());
+			if(GAME.isGameOver()) {
+				updateScoreBoard(GAME.getPlayers().playerOne, GAME.getPlayers().playerTwo);	
+				setTimeout(() => {
+					updateGameOverScreen(`${GAME.getWinner()} Wins!`);
+					switchScreen("game-over");
+					GAME.resetGame();
+					updateBoardUI(GAME.getBoard());
+				}, switchDelay);
+			} else if(GAME.isGameDraw()) {
+				setTimeout(() => {
+					GAME.resetGame();
+					updateGameOverScreen("Draw!!");
+					switchScreen("game-over");
+					updateBoardUI(GAME.getBoard());
+				}, switchDelay);
+			}
+				});
+
+		startButton.addEventListener("click", () => {
+			const playerName = document.querySelector("input[name='name']").value;
+			if(!playerName) {
+				const warning = document.querySelector(".warning");
+				warning.textContent = "Please input a name";
+				warning.classList.remove("hidden");
+				return;
+			}
+			GAME.createPlayer(playerName, 1);
+			GAME.createPlayer("Computer", 2);
+			updateScoreBoard(GAME.getPlayers().playerOne, GAME.getPlayers().playerTwo);
+			switchScreen("game");
+		});
+
+		nextRoundButton.addEventListener("click", () => {
+			switchScreen("game");
 		})
 	}
 
@@ -259,27 +302,9 @@ const UI = (function() {
 
 
 GAME.createBoard() // instantiate the gameboard
-UI.switchScreen(UI.getScreens().start); // set the 'start' screen as initial screen
+UI.switchScreen("start"); // set the 'start' screen as initial screen
 UI.createBoardUI(GAME.getBoard()); // create the UI for the game board
-
-
-// sets the control (click event listeners for each cells on the board, using even delegation)
-UI.setControls((y,x) => { 
-	GAME.play(GAME.getCurrentTurn(), y, x);
-	UI.updateBoardUI(GAME.getBoard());
-	if(GAME.isGameOver()) {
-		UI.updateScoreBoard(GAME.getPlayers().playerOne, GAME.getPlayers().playerTwo);	
-		setTimeout(() => {
-			GAME.resetGame();
-			UI.updateBoardUI(GAME.getBoard());
-		}, 1000);
-	} else if(GAME.isGameDraw()) {
-		setTimeout(() => {
-			GAME.resetGame();
-			UI.updateBoardUI(GAME.getBoard());
-		}, 1000);
-	}
-});
+UI.setControls();
 
 
 
