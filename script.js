@@ -2,6 +2,7 @@
 (function main() {
 	const TICTACTOE = createTicTacToe();
 	const UI_CONTROLLER = createUIController();
+	let playerMove = true;
 
 	UI_CONTROLLER.setControls();
 	UI_CONTROLLER.setStartButtonHandler((inputValues) => {
@@ -9,12 +10,27 @@
 		const playerTwo = TICTACTOE.createPlayer("Computer", "x");
 		TICTACTOE.setPlayers(playerOne, playerTwo);
 		UI_CONTROLLER.switchScreen("game");
+		const currentTurn = TICTACTOE.getState().currentTurn;
+		UI_CONTROLLER.updateCurrentTurnName(currentTurn.getName());
 	});
 
 	UI_CONTROLLER.setGameBoardHandler((y, x) => {
+		if(!playerMove) return;
 		const currentTurn = TICTACTOE.getState().currentTurn;
-		TICTACTOE.play(currentTurn.getMarker(), y, x);
+		const playResult = TICTACTOE.play(currentTurn.getMarker(), y, x);	
+		UI_CONTROLLER.updateCurrentTurnName(currentTurn.getName());
 		UI_CONTROLLER.updateBoard(TICTACTOE.getBoard());
+		if(playResult === "failed") return;
+		playerMove = false;
+		UI_CONTROLLER.updateCurrentTurnName(TICTACTOE.getState().currentTurn.getName());
+		setTimeout(() => {
+			const currentTurn = TICTACTOE.getState().currentTurn;
+			const [y, x] = TICTACTOE.computerMove();
+			TICTACTOE.play(currentTurn.getMarker(), y, x);
+			UI_CONTROLLER.updateBoard(TICTACTOE.getBoard());
+			playerMove = true;
+			UI_CONTROLLER.updateCurrentTurnName(TICTACTOE.getState().currentTurn.getName());
+		}, 750)
 		
 		if(TICTACTOE.getState().isGameOver) {
 			setTimeout(() => {
@@ -93,10 +109,12 @@ function createTicTacToe() {
 	}
 
 	function play(marker, y, x) {
+		if(board[y][x] !== null) return "failed";
 		board[y][x] = marker;
 		check();
 		switchTurn();
 		logBoard(board, state);
+		return "success"
 	}
 
 	function check() {
@@ -131,6 +149,21 @@ function createTicTacToe() {
 		}
 	}
 
+	function computerMove() {
+		const possibleMoves = [];
+		board.forEach((y, yi) => {
+			y.forEach((x, xi) => {
+				if(!x) {
+					possibleMoves.push([yi,xi]);
+				}
+			})
+		})
+		if(possibleMoves.length === 0) return [0, 0];
+		const rndIndex = Math.floor(Math.random() * possibleMoves.length);
+		const move = possibleMoves[rndIndex];
+		return [move[0], move[1]];
+	}
+
 	function isDraw() {
 		let emptyCount = 0;
 		board.forEach((y) => {
@@ -157,7 +190,7 @@ function createTicTacToe() {
 	}
 
 
-	return { play, getBoard, getState, createPlayer, setPlayers, reset };
+	return { play, getBoard, getState, createPlayer, setPlayers, reset, computerMove };
 }
 
 
@@ -185,12 +218,12 @@ function createUIController() {
 
 		playAgainButton.addEventListener("click", () => {
 			playAgainButtonHandler();
+
 		});
 
 		nameInputEl.addEventListener("input", () => {
 			inputValues.name = nameInputEl.value
-		})
-
+		});
 
 
 		boardEl.addEventListener("click", (e) => {
@@ -229,6 +262,10 @@ function createUIController() {
 		});
 	}
 
+	function updateCurrentTurnName(name) {
+		document.querySelector(".current-turn").textContent = `${name}'s Turn`;
+	}
+
 	function switchScreen(key) {
 		for(let k in screens) {
 			screens[k].classList.add("hidden");
@@ -244,6 +281,7 @@ function createUIController() {
 		setGameBoardHandler,
 		setStartButtonHandler,
 		setPlayAgainButtonHandler,
+		updateCurrentTurnName,
 	};
 }
 
