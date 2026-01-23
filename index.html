@@ -4,15 +4,20 @@
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>Tic-Tac-Toe</title>
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Bitcount+Single:wght@100..900&family=Roboto:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
 
 	<link rel="stylesheet" href="style.css">
 </head>
 <body>
 	<div class="wrapper">
 		<div id="start-screen">
-			<h1>Tic Tac Toe</h1>
+			<header>
+				<h1>Tic Tac Toe</h1>
+			</header>
 			<div>
-				<label for="name">Input Your Name:</label>
+				<label for="name">Input Your Name</label>
 				<input type="text" id="name" name="name" required>
 				<button id="start-button">Start</button>
 			</div>
@@ -20,7 +25,10 @@
 		<div id="game-screen">
 			<div id="game-board"></div>
 		</div>
-		<div id="game-over-screen">Game Over</div>
+		<div id="game-over-screen">
+			<p class="announcemnt">You Win!</p>
+			<button id="play-again-button">Play Again</button>
+		</div>
 	</div>
 	<script src="script.js"></script>
 </body>

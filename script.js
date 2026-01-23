@@ -5,8 +5,8 @@
 
 	UI_CONTROLLER.setControls();
 	UI_CONTROLLER.setStartButtonHandler((inputValues) => {
-		const playerOne = TICTACTOE.createPlayer(inputValues.name, "x");
-		const playerTwo = TICTACTOE.createPlayer("Computer", "o");
+		const playerOne = TICTACTOE.createPlayer(inputValues.name, "o");
+		const playerTwo = TICTACTOE.createPlayer("Computer", "x");
 		TICTACTOE.setPlayers(playerOne, playerTwo);
 		UI_CONTROLLER.switchScreen("game");
 	});
@@ -14,12 +14,21 @@
 	UI_CONTROLLER.setGameBoardHandler((y, x) => {
 		const currentTurn = TICTACTOE.getState().currentTurn;
 		TICTACTOE.play(currentTurn.getMarker(), y, x);
+		UI_CONTROLLER.updateBoard(TICTACTOE.getBoard());
 		
 		if(TICTACTOE.getState().isGameOver) {
-			UI_CONTROLLER.switchScreen("over");
+			setTimeout(() => {
+				UI_CONTROLLER.switchScreen("over");
+			}, 500)
 		}
 
 	});
+
+	UI_CONTROLLER.setPlayAgainButtonHandler(() => {
+		TICTACTOE.reset();
+		UI_CONTROLLER.updateBoard(TICTACTOE.getBoard());
+		UI_CONTROLLER.switchScreen("game");
+	})
 
 	UI_CONTROLLER.switchScreen("start");
 	UI_CONTROLLER.updateBoard(TICTACTOE.getBoard());
@@ -66,6 +75,13 @@ function createTicTacToe() {
 			b.push(r);
 		}
 		return b;
+	}
+
+	function reset() {
+		board = createBoard();
+		state.isGameOver = false;
+		state.winner = null;
+		state.currentTurn = players.playerOne;
 	}
 
 	function getBoard() {
@@ -141,7 +157,7 @@ function createTicTacToe() {
 	}
 
 
-	return { play, getBoard, getState, createPlayer, setPlayers };
+	return { play, getBoard, getState, createPlayer, setPlayers, reset };
 }
 
 
@@ -150,6 +166,7 @@ function createUIController() {
 	const inputValues = { name: "", };
 	let gameBoardHandler = null;
 	let startButtonHandler = null;
+	let playAgainButtonHandler = null;
 
 	const screens = {
 		start: document.querySelector("#start-screen"),
@@ -160,14 +177,21 @@ function createUIController() {
 	function setControls() {
 		const startButton = document.querySelector("#start-button");
 		const nameInputEl = document.querySelector("#name");
+		const playAgainButton = document.querySelector("#play-again-button");
 
 		startButton.addEventListener("click", () => {
 			startButtonHandler(inputValues);
 		});
 
+		playAgainButton.addEventListener("click", () => {
+			playAgainButtonHandler();
+		});
+
 		nameInputEl.addEventListener("input", () => {
 			inputValues.name = nameInputEl.value
 		})
+
+
 
 		boardEl.addEventListener("click", (e) => {
 			const t = e.target;
@@ -186,6 +210,10 @@ function createUIController() {
 	function setStartButtonHandler(fn) {
 		startButtonHandler = fn;
 	}
+	
+	function setPlayAgainButtonHandler(fn) {
+		playAgainButtonHandler = fn;
+	}
 
 	function updateBoard(board) {
 		boardEl.innerHTML = "";
@@ -195,6 +223,7 @@ function createUIController() {
 				cell.className = "cell";
 				cell.dataset.y = yi;
 				cell.dataset.x = xi;
+				cell.textContent = x;
 				boardEl.appendChild(cell);
 			});
 		});
@@ -214,6 +243,7 @@ function createUIController() {
 		updateBoard, 
 		setGameBoardHandler,
 		setStartButtonHandler,
+		setPlayAgainButtonHandler,
 	};
 }
 
