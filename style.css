@@ -1,105 +1,96 @@
 * {
 	box-sizing: border-box;
-	margin: 0;
 	padding: 0;
-
-	--bg-prime: #FFE08F;
-	--bg-second: #FF6C0C;
-	--bg-red: #BF1A1A;
-	--bg-blue: #060771;
-
-	--fg-prime: #ffffff;
-	--fg-second: #2B2A2A;
+	margin: 0;
+	--bg-prime: #E8F1F2;
+	--bg-second: #001A23;
+	--fg-prime: #0B100D;
+	--fg-second: #F3F7F5;
 }
 
+html {
+	background-color: var(--bg-prime);
+	font-family: Roboto, sans-serif;
+}
 
 .hidden {
-	display: none !important;
+	display: none !important;	
+}
+
+input, button {
+	padding: 0.5em 1em;
 }
 
 button {
-	padding: 0.5em 1em;
+	cursor: pointer;
+}
+
+input {
+	outline: none;
+	border: none;
+	border-bottom: 1px solid var(--bg-second);
+	background-color: transparent;
 }
 
 .wrapper {
 	max-width: 1024px;
-	height: 600px;
-	margin: 4rem auto;
-	background-color: var(--bg-prime);
-	box-shadow: 2px 2px 24px 5px #333;
-	padding: 1rem;
+	height: 800px;
+	margin: 0 auto;
 	display: flex;
 	justify-content: center;
 	align-items: center;
 }
 
 
-.start-screen {
-	margin-top: -4rem;
-}
-
-.start-screen h1 {
-	background-color: var(--bg-blue);
-	color: var(--fg-prime);
-	padding: 0.5em;
-}
-
-.start-screen-input {
-	margin-top: 1rem;
-	width: 300px;
+#start-screen {
 	display: flex;
 	flex-direction: column;
 	gap: 1rem;
 }
 
-.start-screen-input > .warning {
-	color: var(--bg-red);
-}
-
-.start-screen-input > label {
-	font-weight: bold;
-	font-size: 1.5rem;
-}
-
-.start-screen-input > input,
-.start-screen-input > button {
-	padding: 0.5em 1em;
-}
-
-.game-screen {
-	display: flex;
-	justify-content: center;
-	width: 100%;
-}
-
-.score-board {
+#start-screen header {
 	background-color: var(--bg-second);
-	width: 40%;
+	color: var(--fg-second);
+	text-align: center;
+	font-family: Arial, Helvetica, sans-serif;
+}
+
+#start-screen div {
 	display: flex;
-	justify-content: space-between;
-	font-size: 2rem;
-	padding: 1rem;
+	flex-direction: column;
+	gap: 0.5rem;
 }
 
-.score-board > * {
-	text-align: center
-}
-
-.game-board {
+#game-screen #game-board {
 	width: 500px;
 	height: 500px;
-	border: 1px solid;
-	margin: 0 auto;
 	display: grid;
 	grid-template-columns: repeat(3, 1fr);
 	grid-template-rows: repeat(3, 1fr);
+	gap: 0.5rem;
+	font-family: "Bitcount Single", Arial;
+	font-size: 7rem;
 }
 
-.cell {
-	display: grid;
-	place-content: center;
-	font-size: 4rem;
+
+#game-screen .current-turn {
+	font-weight: bold;
+	font-size: 2rem;
+	text-align: center;
+	margin-bottom: 1rem;
+}
+
+#game-board .cell {
 	border: 1px solid;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+
+#game-over-screen {
+	font-size: 2rem;
+	text-align: center;
+	font-weight: bold;
 }
 
 .game-over-screen {
