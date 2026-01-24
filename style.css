@@ -92,3 +92,14 @@ input {
 	text-align: center;
 	font-weight: bold;
 }
+
+.game-over-screen {
+	width: 500px;
+	height: 500px;
+	font-size: 2rem;
+	display: flex;
+	gap: 1rem;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+}
